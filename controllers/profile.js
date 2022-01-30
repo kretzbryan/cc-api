@@ -2,23 +2,21 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const crypto = require('crypto');
-const Grid = require('gridfs-stream');
+// const Grid = require('gridfs-stream');
 const db = require('../models');
 const mongo = require('mongodb');
 const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
-const config = require('../../config/default');
-const conn = mongoose.createConnection(
-	process.env.MONGODB_URI || config.mongoURI
-);
+console.log(process.env.MONGO_URI);
+const conn = mongoose.createConnection(process.env.MONGO_URI);
 
-let gfs;
+// let gfs;
 
-conn.once('open', () => {
-	gfs = Grid(conn.db, mongoose.mongo);
-	gfs.collection('profileImages');
-});
+// conn.once('open', () => {
+// 	gfs = Grid(conn.db, mongoose.mongo);
+// 	gfs.collection('profileImages');
+// });
 
 // Shows all profiles with the exception of the current User
 router.get('/all', auth, async (req, res) => {
@@ -64,17 +62,17 @@ router.put('/image', auth, async function (req, res) {
 });
 
 // creates a show route based on file name to for reference later
-router.get('/image/:filename', (req, res) => {
-	gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-		if (!file) {
-			res.status(404).json({ message: 'image not found' });
-		}
-		if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
-			const readstream = gfs.createReadStream(file.filename);
-			readstream.pipe(res);
-		}
-	});
-});
+// router.get('/image/:filename', (req, res) => {
+// 	gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+// 		if (!file) {
+// 			res.status(404).json({ message: 'image not found' });
+// 		}
+// 		if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
+// 			const readstream = gfs.createReadStream(file.filename);
+// 			readstream.pipe(res);
+// 		}
+// 	});
+// });
 
 router.put('/edit-profile/:id', (req, res) => {
 	db.User.findByIdAndUpdate(

@@ -1,3 +1,6 @@
+const dotenv = require('dotenv');
+
+dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -11,14 +14,12 @@ const connectDB = db.connectDB;
 
 connectDB();
 
-app.use(express.json({extended:false}))
+app.use(express.json({ extended: false }));
 app.use(fileUpload());
 app.use(methodOverride('_method'));
 app.use(express.static(__dirname + '/public'));
 app.use(cors());
 app.set('view engine', 'ejs');
-
-
 
 app.use('/api/comment', controllers.comment);
 app.use('/api/user', controllers.user);
@@ -28,8 +29,6 @@ app.use('/api/faq', controllers.faq);
 app.use('/api/post', controllers.post);
 app.use('/api/gig', controllers.gig);
 
-
-app.listen( PORT, () => {
-    console.log(`Now on port ${PORT}`)
-})
-
+app.listen(PORT, () => {
+	console.log(`Now on port ${PORT}`);
+});

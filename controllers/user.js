@@ -4,7 +4,6 @@ const db = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
-const config = require('../../config/default');
 
 router.get('/', auth, async (req, res) => {
 	try {
@@ -19,6 +18,7 @@ router.get('/', auth, async (req, res) => {
 // logs in user and creates token for logged user
 router.post('/login', async function (req, res) {
 	const { username, password } = req.body;
+	console.log();
 	try {
 		const foundUser = await db.User.findOne({ username });
 		console.log(foundUser);
@@ -35,13 +35,18 @@ router.post('/login', async function (req, res) {
 			},
 		};
 
-		jwt.sign(payload, config.jwtSecret, { expiresIn: 36000 }, (err, token) => {
-			if (err) throw err;
-			console.log(token, 'token');
-			res.json({ token });
-		});
+		jwt.sign(
+			payload,
+			process.env.JWT_SECRET,
+			{ expiresIn: 36000 },
+			(err, token) => {
+				if (err) throw err;
+				console.log(token, 'token');
+				res.json({ token });
+			}
+		);
 	} catch (err) {
-		res.send({ message: 'Internal Server Error' });
+		res.send({ message: err.message });
 	}
 });
 
