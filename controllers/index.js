@@ -7,4 +7,6 @@ module.exports = {
 	user: require('./user'),
 	comment: require('./comment'),
 	auth: require('./auth'),
+	tag: require('./tag'),
+	locations: require('./locations'),
 };

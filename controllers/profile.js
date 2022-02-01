@@ -1,15 +1,16 @@
-const express = require('express');
-const router = express.Router();
 const path = require('path');
 const crypto = require('crypto');
 // const Grid = require('gridfs-stream');
+const express = require('express');
+const router = express.Router();
 const db = require('../models');
 const mongo = require('mongodb');
 const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
 console.log(process.env.MONGO_URI);
-const conn = mongoose.createConnection(process.env.MONGO_URI);
+console.log(router.get);
+// const conn = mongoose.createConnection(process.env.MONGO_URI);
 
 // let gfs;
 
@@ -19,7 +20,7 @@ const conn = mongoose.createConnection(process.env.MONGO_URI);
 // });
 
 // Shows all profiles with the exception of the current User
-router.get('/all', auth, async (req, res) => {
+router.get('/all', async (req, res) => {
 	try {
 		const profiles = await db.User.find().select('-password');
 		const user = req.user.id;
@@ -41,7 +42,7 @@ router.get('/:id', async (req, res) => {
 	}
 });
 
-router.put('/image', auth, async function (req, res) {
+router.put('/image', async function (req, res) {
 	req.file = req.files.file;
 	try {
 		await upload(req, res);

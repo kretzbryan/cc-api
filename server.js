@@ -25,6 +25,8 @@ app.set('view engine', 'ejs');
 app.use('/api/auth', controllers.auth);
 app.use('/api/data/*', protect);
 app.use('/api/data/comment', controllers.comment);
+app.use('/api/data/locations', controllers.locations);
+app.use('/api/data/tag', controllers.tag);
 app.use('/api/data/user', controllers.user);
 app.use('/api/data/register', controllers.register);
 app.use('/api/data/profile', controllers.profile);

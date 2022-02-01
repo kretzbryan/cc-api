@@ -4,7 +4,7 @@ const { comment } = require('../controllers');
 const eventSchema = new mongoose.Schema(
 	{
 		title: { type: String, required: true },
-		text: { type: String, required: true },
+		description: { type: String, required: true },
 		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
@@ -15,6 +15,11 @@ const eventSchema = new mongoose.Schema(
 				ref: 'Post',
 			},
 		],
+		viewability: {
+			type: String,
+			required: true,
+			default: 'Everyone',
+		},
 		timeRange: {
 			start: { type: Date, required: true },
 			end: { type: Date, required: true },
@@ -36,7 +41,6 @@ const eventSchema = new mongoose.Schema(
 			},
 		],
 		location: { type: String, required: true },
-		name: { type: String, required: true },
 	},
 	{ timestamps: true }
 );

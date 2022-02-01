@@ -2,16 +2,20 @@ const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema(
 	{
-		type: {
+		postType: {
 			type: String,
 			required: true,
 		},
+		viewability: {
+			type: String,
+			required: true,
+			default: 'Everyone',
+		},
 		text: { type: String, required: true },
-		name: { type: String, required: true },
 		comments: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
-				ref: 'Post',
+				ref: 'Comment',
 			},
 		],
 		reactions: [
@@ -24,6 +28,12 @@ const postSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
 		},
+		tags: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Tag',
+			},
+		],
 	},
 	{ timestamps: true }
 );
