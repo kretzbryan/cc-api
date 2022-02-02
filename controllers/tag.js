@@ -4,7 +4,8 @@ const db = require('../models');
 const auth = require('../middleware/auth');
 
 router.get('/', async (req, res) => {
-	const { text } = req.body;
+	// const { text } = req.body;
+	console.log('text', req.body);
 	try {
 		const tags = await db.Tag.find({ handle: { $regex: text } });
 

@@ -44,15 +44,21 @@ router.post(
 
 // logs in user and creates token for logged user
 router.post('/login', async function (req, res) {
-	const { username, password } = req.body;
-	console.log();
 	try {
-		const foundUser = await db.User.findOne({ username });
+		const { username, password } = req.body;
+		console.log(req.body);
+		const foundUser = await db.User.findOne({ username }).select('+password');
 		console.log(foundUser);
 		if (!foundUser) {
 			return res.status(400).json({ message: 'Password or email incorrect.' });
 		}
-		const match = await bcrypt.compare(password, foundUser.password);
+		const match = await bcrypt
+			.compare(password, foundUser.password)
+			.catch((err) => {
+				throw {
+					message: `At match${err.message}`,
+				};
+			});
 		if (!match) {
 			return res.status(400).json({ message: 'Password or email incorrect.' });
 		}
@@ -67,7 +73,9 @@ router.post('/login', async function (req, res) {
 			process.env.JWT_SECRET,
 			{ expiresIn: 36000 },
 			(err, token) => {
-				if (err) throw err;
+				if (err) {
+					throw { message: `At jwt sign${err.message}` };
+				}
 				console.log(token, 'token');
 				res.json({ token });
 			}

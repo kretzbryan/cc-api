@@ -16,14 +16,14 @@ const connectDB = db.connectDB;
 connectDB();
 
 app.use(express.json({ extended: false }));
+// app.use(bodyParser.json());
 app.use(fileUpload());
 app.use(methodOverride('_method'));
-app.use(express.static(__dirname + '/public'));
 app.use(cors());
-app.set('view engine', 'ejs');
 
 app.use('/api/auth', controllers.auth);
 app.use('/api/data/*', protect);
+app.use('/api/data/image', controllers.image);
 app.use('/api/data/comment', controllers.comment);
 app.use('/api/data/locations', controllers.locations);
 app.use('/api/data/tag', controllers.tag);

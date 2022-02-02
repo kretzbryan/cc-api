@@ -1,23 +1,9 @@
 const path = require('path');
 const crypto = require('crypto');
-// const Grid = require('gridfs-stream');
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
-const mongo = require('mongodb');
-const mongoose = require('mongoose');
-const auth = require('../middleware/auth');
 const upload = require('../middleware/upload');
-console.log(process.env.MONGO_URI);
-console.log(router.get);
-// const conn = mongoose.createConnection(process.env.MONGO_URI);
-
-// let gfs;
-
-// conn.once('open', () => {
-// 	gfs = Grid(conn.db, mongoose.mongo);
-// 	gfs.collection('profileImages');
-// });
 
 // Shows all profiles with the exception of the current User
 router.get('/all', async (req, res) => {

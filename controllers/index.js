@@ -6,7 +6,8 @@ module.exports = {
 	gig: require('./gig'),
 	user: require('./user'),
 	comment: require('./comment'),
-	auth: require('./auth'),
 	tag: require('./tag'),
 	locations: require('./locations'),
+	auth: require('./auth'),
+	image: require('./image'),
 };

@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
-const auth = require('../middleware/auth');
 
 router.post('/', async (req, res) => {
 	const { itemType, itemId, text } = req.body;
