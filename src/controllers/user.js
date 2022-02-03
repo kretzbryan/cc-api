@@ -43,4 +43,39 @@ router.get('/', async (req, res) => {
 	}
 });
 
+router.post('/check-unique-field', async (req, res) => {
+	try {
+		console.log('req.body', req.body);
+		let user, user1, user2;
+		user = await db.User.findOne({
+			[req.body.key]: req.body.value,
+		});
+		if (req.body.key === 'email' && !user) {
+			console.log('checking second email');
+			user = await db.User.findOne({
+				newEmail: req.body.value,
+			});
+		}
+		// user = user1 || user2;
+
+		if (req.user.id.valueOf() === (user && user._id.valueOf()) || !user) {
+			res.status(200).json({ unique: true });
+		} else {
+			res.status(200).json({ unique: false });
+		}
+	} catch (err) {
+		res.status(500).send({ msg: err.message });
+	}
+});
+
+router.get('/', async (req, res) => {
+	try {
+		const user = await db.User.findById(req.user.id);
+
+		res.json({ user });
+	} catch (err) {
+		res.status(500).send({ msg: err.message });
+	}
+});
+
 module.exports = router;

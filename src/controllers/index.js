@@ -10,4 +10,5 @@ module.exports = {
 	locations: require('./locations'),
 	auth: require('./auth'),
 	image: require('./image'),
+	people: require('./people'),
 };

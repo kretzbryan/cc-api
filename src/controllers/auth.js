@@ -34,7 +34,10 @@ router.post(
 			const salt = await bcrypt.genSalt(10);
 			hash = await bcrypt.hash(password, salt);
 			req.body.password = hash;
-			const newUser = await db.User.create(req.body);
+			const newUser = new db.User(req.body);
+			const newPrivacy = await db.Privacy.create({});
+			newUser.privacy = newPrivacy;
+			await newUser.save();
 			res.send('User registered');
 		} catch (err) {
 			console.log(err.message), res.status(500).send('Internal Server Error');

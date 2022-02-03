@@ -23,5 +23,12 @@ module.exports = module.exports = {
 	User: require('./User'),
 	Comment: require('./Comment'),
 	Tag: require('./Tag'),
+	Privacy: require('./Privacy'),
+	Following: require('./Following'),
+	Event: require('./Event'),
+	Message: require('./Message'),
+	MessageThread: require('./MessageThread'),
+	RSVP: require('./RSVP'),
+	UserReaction: require('./UserReaction'),
 	connectDB: connectDB,
 };

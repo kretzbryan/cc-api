@@ -1,12 +1,12 @@
 const multer = require('multer'); // multer will be used to handle the form data.
 const Aws = require('aws-sdk'); // aws-sdk library will used to upload image to s3 bucket.
-
+const fs = require('fs');
 // creating the storage variable to upload the file and providing the destination folder,
 // if nothing is provided in the callback it will get uploaded in main directory
 
 const storage = multer.memoryStorage({
 	destination: function (req, file, cb) {
-		console.log('file', file);
+		console.log('file in multer', file);
 		cb(null, '../uploads/');
 	},
 });
@@ -14,7 +14,7 @@ const storage = multer.memoryStorage({
 // below variable is define to check the type of file which is uploaded
 
 const filefilter = (req, file, cb) => {
-	console.log('file', file);
+	console.log('file in filter', file);
 	if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
 		cb(null, true);
 	} else {
@@ -31,27 +31,18 @@ const s3 = new Aws.S3({
 	secretAccessKey: process.env.AWS_ACCESS_KEY_SECRET, // secretAccessKey is also store in .env file
 });
 
-exports.uploadImage = async function (file) {
+exports.uploadImage = async function (buffer, name, type, directory) {
 	try {
 		const params = {
 			Bucket: process.env.AWS_BUCKET_NAME, // bucket that we made earlier
-			Key: file.originalname, // Name of the image
-			Body: file.buffer, // Body which will contain the image in buffer format
-			ACL: 'public-read-write', // defining the permissions to get the public link
-			ContentType: 'image/jpeg', // Necessary to define the image content-type to view the photo in the browser with the link
+			ACL: 'public-read',
+			Body: buffer,
+			Bucket: config.env.S3_BUCKET,
+			ContentType: type.mime,
+			Key: `${directory}/${name}.${type.ext}`, // Necessary to define the image content-type to view the photo in the browser with the link
 		};
 
-		return s3.upload(params, (error, data) => {
-			if (error) {
-				throw {
-					message: error.message,
-				}; // if we get any error while uploading error message will be returned.
-			}
-
-			// If not then below code will be executed
-
-			return data; // this will give the information about the object in which photo is stored
-		});
+		return s3.upload(params).promise();
 	} catch (err) {
 		console.log(err.message);
 	}

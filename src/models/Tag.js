@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const messageSchema = new mongoose.Schema({
+const tagSchema = new mongoose.Schema({
 	tagType: {
 		type: String,
 		required: true,
@@ -8,4 +8,4 @@ const messageSchema = new mongoose.Schema({
 	handle: { type: String, required: true },
 });
 
-module.exports = mongoose.model('Message', messageSchema);
+module.exports = mongoose.model('Tag', tagSchema);

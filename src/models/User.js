@@ -4,8 +4,9 @@ const userSchema = new mongoose.Schema(
 	{
 		firstName: { type: String, required: true },
 		lastName: { type: String, required: true },
-		username: { type: String, required: true, unique: true },
+		username: { type: String, required: true, unique: true, minlength: 6 },
 		email: { type: String, required: true, unique: true },
+		newEmail: { type: String, required: true, unique: true },
 		password: { type: String, required: true, select: false },
 		skills: { type: String, required: false },
 		profileImage: {
@@ -33,18 +34,20 @@ const userSchema = new mongoose.Schema(
 				ref: 'Gig',
 			},
 		],
-		friends: [
+		connections: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'User',
 			},
 		],
-		following: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'User',
-			},
-		],
+		following: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Following',
+		},
+		privacy: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Privacy',
+		},
 	},
 	{ timestamps: true }
 );

@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
 				} else {
 					return item;
 				}
-			})}&key=${apiKey}`,
+			})}&type=locality&key=${apiKey}`,
 			headers: {},
 		}).catch((err) => {
 			throw {

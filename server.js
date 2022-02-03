@@ -1,16 +1,15 @@
 const dotenv = require('dotenv');
-
 dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 4000;
-const controllers = require('./controllers');
+const controllers = require('./src/controllers');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const fileUpload = require('express-fileupload');
-const db = require('./models');
-const { protect } = require('./middleware/auth');
+const db = require('./src/models');
+const { protect } = require('./src/middleware/auth');
 const connectDB = db.connectDB;
 
 connectDB();
@@ -30,6 +29,7 @@ app.use('/api/data/tag', controllers.tag);
 app.use('/api/data/user', controllers.user);
 app.use('/api/data/register', controllers.register);
 app.use('/api/data/profile', controllers.profile);
+app.use('/api/data/people', controllers.people);
 app.use('/api/data/faq', controllers.faq);
 app.use('/api/data/post', controllers.post);
 app.use('/api/data/gig', controllers.gig);
