@@ -34,10 +34,22 @@ const userSchema = new mongoose.Schema(
 				ref: 'Gig',
 			},
 		],
+		events: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Event',
+			},
+		],
 		connections: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'User',
+			},
+		],
+		messages: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'MessageThread',
 			},
 		],
 		following: {

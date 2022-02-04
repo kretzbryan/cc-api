@@ -36,7 +36,9 @@ router.post(
 			req.body.password = hash;
 			const newUser = new db.User(req.body);
 			const newPrivacy = await db.Privacy.create({});
+			const newFollowing = await db.Following.create({});
 			newUser.privacy = newPrivacy;
+			newUser.following = newFollowing;
 			await newUser.save();
 			res.send('User registered');
 		} catch (err) {

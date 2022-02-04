@@ -11,4 +11,7 @@ module.exports = {
 	auth: require('./auth'),
 	image: require('./image'),
 	people: require('./people'),
+	message: require('./message'),
+	event: require('./event'),
+	connection: require('./connection'),
 };

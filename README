@@ -1,0 +1,38 @@
+Friend Request
+
+- User clicks on friend request.
+
+  - Users Id added to recipients pendingRequests.received.connections (see PendingRequests model)
+  - recipients Id added to Users pendingRequests.sent.connections (see PendingRequests model)
+
+- Recipient accepts request
+  - Recipients Id removed from Users pendingRequests.sent.connections and added to Users connections (see User Model)
+  - Users Id removed from recipients pendingRequests.received.connections and added to recipients connections.
+
+Message Request
+
+- User sends message thread with message (see MessageThread and Message model) to recipient that isn't a connection.
+
+  - Message Thread is created with both recipients added to users array, and a message is created and added to the messages array of the message thread.
+  - Message Thread is added to the recipients pendingRequests.messages.
+
+- Recipient accepts request.
+  - Message thread is removed from both the users pendingRequests.sent.messages and the recipients pendingRequests.received.messages and added to their messages array
+
+Send Message to Existing thread
+
+- User sends message
+  - Message is created and added to message thread, it will be marked as unread.
+  - User will be notified in the dashboard if there are any new messages.
+
+Event Creation
+
+- User Creates Event
+  - Event is created and added to user.events
+  - Another user expresses interest and RSVPs on the event (see RSVP model added to Event model)
+
+Gig Creation
+
+- User Creates Gig
+  - Gig is created and added to user.gigs
+  - User searches for gigs available in a searched area and can send a message request to gig creator (user will not see who the creator is until the creator accepts or allows open privacy settings for the gig.)
