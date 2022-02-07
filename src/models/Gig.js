@@ -11,7 +11,7 @@ const gigSchema = new mongoose.Schema(
 			required: true,
 			default: 'Everyone',
 		},
-		user: {
+		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
 		},

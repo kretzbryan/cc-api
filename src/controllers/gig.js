@@ -23,14 +23,12 @@ router.get('/:id', async (req, res) => {
 
 // Creates gig with author Id, adds gig id to user.Gigs
 router.post('/', async (req, res) => {
+	const { gig } = req.body;
 	try {
-		const user = await db.User.findById(req.user.id).select('-password');
+		const user = await db.User.findById(req.user.id);
 		const gig = new db.Gig({
-			title: req.body.title,
-			location: req.body.location,
-			text: req.body.text,
-			name: `${user.firstName} ${user.lastName}`,
-			user: user.id,
+			gig,
+			createdBy: user.id,
 		});
 		await gig.save();
 		await user.gigs.push(gig._id);

@@ -3,7 +3,6 @@ const { comment } = require('../controllers');
 
 const messageSchema = new mongoose.Schema(
 	{
-		title: { type: String, required: true },
 		text: { type: String, required: true },
 		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -12,6 +11,11 @@ const messageSchema = new mongoose.Schema(
 		read: {
 			type: Boolean,
 			required: true,
+		},
+		reaction: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Reaction',
+			required: false,
 		},
 	},
 	{ timestamps: true }

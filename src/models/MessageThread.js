@@ -3,6 +3,14 @@ const { comment } = require('../controllers');
 
 const messageThreadSchema = new mongoose.Schema(
 	{
+		subject: {
+			type: String,
+			required: true,
+		},
+		messageType: {
+			type: String,
+			required: true,
+		},
 		users: [
 			{
 				type: mongoose.Schema.Types.ObjectId,

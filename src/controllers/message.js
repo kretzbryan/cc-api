@@ -2,6 +2,31 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models');
 
+// router.get('/get-messages/:id', async (req, res) => {
+// 	try {
+// 		const { id } = req.params;
+// 		const foundThread = await db.MessageThread.findById(threadId).catch(
+// 			(err) => {
+// 				throw {
+// 					message: err.message,
+// 				};
+// 			}
+// 		);
+// 		if (foundThread.users.includes(threadId)) {
+// 			const savedMessage = await db.Message.create(message).catch((err) => {
+// 				throw {
+// 					message: err.message,
+// 				};
+// 			});
+// 			foundThread.messages.push(message);
+// 			await foundThread.save();
+// 			res.status(200).json({ savedMessage });
+// 		}
+// 	} catch (err) {
+// 		console.log(err.message);
+// 	}
+// });
+
 router.post('/send-message', async (req, res) => {
 	try {
 		const { threadId, message } = req.body;
@@ -27,44 +52,49 @@ router.post('/send-message', async (req, res) => {
 	}
 });
 
-router.post('/send-message-request', async (req, res) => {
+router.post('/new-message-thread', async (req, res) => {
+	const { message } = req.body;
 	try {
-		const { recipientId, message } = req.body;
+		// Find User
 		const user = await db.User.findById(req.user.id).catch((err) => {
 			throw {
 				message: err.message,
 			};
 		});
-
-		const recipient = await db.User.findById(recipientId).catch((err) => {
-			throw {
-				message: err.message,
-			};
+		// Create message with user Credentials
+		const newMessage = await db.Message.create({
+			createdBy: user._id,
+			text: message.text,
 		});
-		const recipientPendingRequests = await db.PendingRequest.findById(
-			recipient.pendingRequests
-		).catch((err) => {
-			throw {
-				message: err.message,
-			};
-		});
-		const newMessage = await db.Message.create(message).catch((err) => {
-			throw {
-				message: err.message,
-			};
-		});
-		const newThread = new db.MessageThread();
-		newThread.users = [user, recipient];
-		newThread.users.push(newMessage);
 
-		const savedThread = await newThread.save();
+		const newThread = await db.MessageThread.create({
+			users: [...message.recipients, user],
+			messages: [newMessage],
+			subject: message.subject,
+		});
 
-		recipientPendingRequests.messages.push(savedThread);
-		user.messages.push(savedThread);
+		// Find recipient(s) and add new Thread to messages
+		const recipient = await db.User.findById(message.recipients[0]).catch(
+			(err) => {
+				throw {
+					message: err.message,
+				};
+			}
+		);
+
+		recipient.message = {
+			unreadCount: unreadCount++,
+			messages: [...recipient.message.messages, newThread],
+		};
+		user.message = {
+			...user.message,
+			messages: [...user.message.messages, newThread],
+		};
+
 		await user.save();
-		await recipientPendingRequests.save();
+		await recipient.save();
 
-		res.status(200).json({ savedMessage });
+		res.status(200).json({ success: true });
 	} catch (err) {
 		console.log(err.message);
 	}

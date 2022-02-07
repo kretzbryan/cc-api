@@ -40,18 +40,37 @@ const userSchema = new mongoose.Schema(
 				ref: 'Event',
 			},
 		],
-		connections: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'User',
+		connections: {
+			requests: {
+				incoming: [
+					{
+						type: mongoose.Schema.Types.ObjectId,
+						ref: 'User',
+					},
+				],
+				outgoing: [
+					{
+						type: mongoose.Schema.Types.ObjectId,
+						ref: 'User',
+					},
+				],
 			},
-		],
-		messages: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'MessageThread',
-			},
-		],
+			confirmed: [
+				{
+					type: mongoose.Schema.Types.ObjectId,
+					ref: 'User',
+				},
+			],
+		},
+		message: {
+			unreadCount: { type: Number, required: true, default: 0 },
+			messages: [
+				{
+					type: mongoose.Schema.Types.ObjectId,
+					ref: 'MessageThread',
+				},
+			],
+		},
 		following: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Following',
