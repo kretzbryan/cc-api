@@ -9,11 +9,7 @@ const userSchema = new mongoose.Schema(
 		newEmail: { type: String, required: true, unique: true },
 		password: { type: String, required: true, select: false },
 		skills: { type: String, required: false },
-		profileImage: {
-			filename: { type: String, required: false },
-			mimetype: { type: String, required: false },
-			required: false,
-		},
+		profileImage: { type: String, required: false },
 		location: { type: String, required: false },
 		certifications: [
 			{

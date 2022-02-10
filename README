@@ -36,3 +36,7 @@ Gig Creation
 - User Creates Gig
   - Gig is created and added to user.gigs
   - User searches for gigs available in a searched area and can send a message request to gig creator (user will not see who the creator is until the creator accepts or allows open privacy settings for the gig.)
+
+-Notification
+
+If user is active in a post or comment, rsvped to an event, saved something user will recieve notifications

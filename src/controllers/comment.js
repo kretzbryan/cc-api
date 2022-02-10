@@ -13,6 +13,7 @@ router.post('/', async (req, res) => {
 			commentLocation: itemType,
 			locationId: itemId,
 		});
+
 		await newComment.save();
 		if (itemType === 'post') {
 			item = await db.Post.findById(itemId)

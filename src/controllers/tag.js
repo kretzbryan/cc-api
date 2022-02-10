@@ -3,28 +3,40 @@ const router = express.Router();
 const db = require('../models');
 const auth = require('../middleware/auth');
 
-router.get('/', async (req, res) => {
-	// const { text } = req.body;
+router.post('/find-tag', async (req, res) => {
+	const { value } = req.body;
 	console.log('text', req.body);
 	try {
-		const tags = await db.Tag.find({ handle: { $regex: text } });
+		const tags = await db.Tag.find({ handle: { $regex: value } }).catch(
+			(err) => {
+				throw {
+					message: err.message,
+				};
+			}
+		);
 
-		res.json({ tags });
+		res.status(200).json({ tags });
 	} catch (err) {
 		console.log(err);
 	}
 });
 
-router.post('/', async (req, res) => {
-	const { text } = req.body;
+router.post('/create-tag', async (req, res) => {
+	const { value } = req.body;
+	let tag;
 	try {
-		let tag;
-		tag = await db.Tag.findById(req.params.id);
+		tag = await db.Tag.findOne({ handle: value });
+
 		if (!tag) {
-			tag = await db.Tag.create({ text });
+			console.log('no tag found!');
+			tag = await db.Tag.create({ handle: value }).catch((err) => {
+				throw {
+					message: err.message,
+				};
+			});
 		}
 
-		res.json({ tag });
+		res.status(200).json({ tag });
 	} catch (err) {
 		console.log(err);
 	}

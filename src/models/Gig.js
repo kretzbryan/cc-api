@@ -5,6 +5,7 @@ const gigSchema = new mongoose.Schema(
 		title: { type: String, required: true },
 		location: { type: String, required: true },
 		text: { type: String, required: true },
+		image: { type: String, required: false },
 		name: { type: String, required: true },
 		viewability: {
 			type: String,

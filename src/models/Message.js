@@ -11,6 +11,7 @@ const messageSchema = new mongoose.Schema(
 		read: {
 			type: Boolean,
 			required: true,
+			default: false
 		},
 		reaction: {
 			type: mongoose.Schema.Types.ObjectId,
