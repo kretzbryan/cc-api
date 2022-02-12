@@ -33,7 +33,7 @@ router.get('/:id', async (req, res) => {
 // Find posts associated with specific User
 router.get('/user/:id', async (req, res) => {
 	try {
-		const posts = await db.Post.find({ user: req.params.id }).populate({
+		const posts = await db.Post.find({ createdBy: req.params.id }).populate({
 			path: 'comments',
 			populate: {
 				path: 'user',

@@ -71,6 +71,7 @@ router.post('/new-message-thread', async (req, res) => {
 			users: [...message.recipients, user],
 			messages: [newMessage],
 			subject: message.subject,
+			messageType: message.messageType,
 		});
 
 		// Find recipient(s) and add new Thread to messages
@@ -83,7 +84,7 @@ router.post('/new-message-thread', async (req, res) => {
 		);
 
 		recipient.message = {
-			unreadCount: unreadCount++,
+			unreadCount: recipient.message.unreadCount++,
 			messages: [...recipient.message.messages, newThread],
 		};
 		user.message = {

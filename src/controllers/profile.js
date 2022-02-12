@@ -19,12 +19,43 @@ router.get('/all', async (req, res) => {
 router.get('/:id', async (req, res) => {
 	try {
 		const foundProfile = await db.User.findById(req.params.id)
-			.populate('posts')
+			.populate({
+				path: 'posts',
+				populate: [
+					{
+						path: 'createdBy',
+						model: 'User',
+					},
+					{
+						path: 'comments',
+						model: 'Comment',
+						populate: [
+							{
+								path: 'createdBy',
+								model: 'User',
+							},
+							{
+								path: 'comments',
+								model: 'Comment',
+								populate: {
+									path: 'createdBy',
+									model: 'User',
+								},
+							},
+						],
+					},
+				],
+			})
 			.populate('gigs')
-			.select('-password');
+			.catch((err) => {
+				throw {
+					message: err.message,
+				};
+			});
+		console.log('foundprofile', foundProfile);
 		res.status(200).json(foundProfile);
 	} catch (err) {
-		console.log(err);
+		console.log(err.message);
 	}
 });
 

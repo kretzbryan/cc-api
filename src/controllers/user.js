@@ -11,6 +11,23 @@ router.get('/', async (req, res) => {
 		const user = await db.User.findById(req.user.id)
 			.select('-password')
 			.populate({
+				path: 'message.messages',
+				populate: [
+					{
+						path: 'users',
+						model: 'User',
+					},
+					{
+						path: 'messages',
+						model: 'Message',
+						populate: {
+							path: 'createdBy',
+							model: 'User',
+						},
+					},
+				],
+			})
+			.populate({
 				path: 'posts',
 				populate: [
 					{
@@ -43,6 +60,8 @@ router.get('/', async (req, res) => {
 	}
 });
 
+router.ge;
+
 router.post('/check-unique-field', async (req, res) => {
 	try {
 		console.log('req.body', req.body);
@@ -68,7 +87,7 @@ router.post('/check-unique-field', async (req, res) => {
 	}
 });
 
-router.get('/', async (req, res) => {
+router.get('/messages', async (req, res) => {
 	try {
 		const user = await db.User.findById(req.user.id);
 

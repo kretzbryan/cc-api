@@ -9,7 +9,7 @@ router.post('/', async (req, res) => {
 		const user = await db.User.findById(req.user.id);
 		const newComment = new db.Comment({
 			text,
-			createdBy: user.id,
+			createdBy: user,
 			commentLocation: itemType,
 			locationId: itemId,
 		});
@@ -43,6 +43,16 @@ router.post('/', async (req, res) => {
 		await item.comments.push(newComment);
 
 		const savedItem = await item.save();
+
+		if (item.createdBy !== user) {
+			const newNotification = await db.Notification.create({
+				notificationType: 'comment',
+				data: savedItem,
+			});
+			const recipient = await db.User.findById(item.createdBy._id);
+			recipient.notifications.new.push(newNotification);
+			await recipient.save();
+		}
 		res.json({ item: savedItem, newComment });
 	} catch (err) {
 		console.log(err);

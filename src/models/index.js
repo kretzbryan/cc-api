@@ -26,6 +26,7 @@ module.exports = module.exports = {
 	Privacy: require('./Privacy'),
 	Following: require('./Following'),
 	PendingRequest: require('./PendingRequest'),
+	Notification: require('./Notification'),
 	Event: require('./Event'),
 	Message: require('./Message'),
 	MessageThread: require('./MessageThread'),
