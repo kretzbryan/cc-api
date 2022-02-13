@@ -30,6 +30,7 @@ const db = require('../models');
 router.post('/send-message', async (req, res) => {
 	try {
 		const { threadId, message } = req.body;
+		const user = await db.User.findById(req.user.id);
 		const foundThread = await db.MessageThread.findById(threadId).catch(
 			(err) => {
 				throw {
@@ -37,15 +38,22 @@ router.post('/send-message', async (req, res) => {
 				};
 			}
 		);
-		if (foundThread.users.includes(threadId)) {
-			const savedMessage = await db.Message.create(message).catch((err) => {
+		if (foundThread.users.includes(req.user.id)) {
+			const newMessage = new db.Message(message);
+			const savedMessage = await newMessage.save().catch((err) => {
 				throw {
 					message: err.message,
 				};
 			});
-			foundThread.messages.push(message);
-			await foundThread.save();
-			res.status(200).json({ savedMessage });
+			foundThread.messages.push(savedMessage);
+			const savedThread = await foundThread.save().catch((err) => {
+				throw {
+					message: err.message,
+				};
+			});
+			res
+				.status(200)
+				.json({ savedMessage: { ...savedMessage._doc, createdBy: user } });
 		}
 	} catch (err) {
 		console.log(err.message);
