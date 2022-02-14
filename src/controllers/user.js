@@ -5,6 +5,18 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
 
+const handleNotificationPopulate = async (notification) => {
+	let data;
+	if (notification.notificationType === 'comment') {
+		console.log('notification', notification);
+		data = await db.Post.findById(notification.data).populate('createdBy');
+	}
+	return {
+		...notification._doc,
+		data,
+	};
+};
+
 router.get('/', async (req, res) => {
 	try {
 		console.log(req.user);
@@ -27,6 +39,7 @@ router.get('/', async (req, res) => {
 					},
 				],
 			})
+			.populate('notifications.new notifications.read')
 			.populate({
 				path: 'posts',
 				populate: [
@@ -54,13 +67,39 @@ router.get('/', async (req, res) => {
 					},
 				],
 			});
-		res.json({ user });
+
+		const notifications = {
+			new: await Promise.all(
+				user.notifications.new.map(async (notification) => {
+					return await handleNotificationPopulate(notification);
+				})
+			),
+			read: await Promise.all(
+				user.notifications.read.map(async (notification) => {
+					return await handleNotificationPopulate(notification);
+				})
+			),
+		};
+		let userCopy = { ...user._doc, notifications };
+
+		console.log(userCopy.notifications.new);
+
+		res.json({ user: userCopy });
 	} catch (err) {
 		res.status(500).send({ msg: err.message });
 	}
 });
 
-router.ge;
+router.post('/update', async (req, res) => {
+	try {
+		console.log('req.body', req.body);
+		const user = await db.User.findByIdAndUpdate(req.user.id, req.body.user);
+
+		res.status(200).json({ user });
+	} catch (err) {
+		res.status(500).send({ msg: err.message });
+	}
+});
 
 router.post('/check-unique-field', async (req, res) => {
 	try {

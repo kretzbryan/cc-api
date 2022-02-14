@@ -17,6 +17,13 @@ const userSchema = new mongoose.Schema(
 			},
 		],
 		insurance: { type: String, required: false },
+		occupation: { type: String, required: false },
+		location: {
+			lat: { type: Number, required: false },
+			lng: { type: Number, required: false },
+			name: { type: String, required: false },
+			address: { type: String, required: false },
+		},
 		posts: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
