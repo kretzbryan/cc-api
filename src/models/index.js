@@ -32,6 +32,5 @@ module.exports = module.exports = {
 	MessageThread: require('./MessageThread'),
 	RSVP: require('./RSVP'),
 	UserReaction: require('./UserReaction'),
-	Location: require('./Location'),
 	connectDB: connectDB,
 };
