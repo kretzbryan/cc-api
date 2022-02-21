@@ -11,10 +11,10 @@ const { v4 } = require('uuid');
 
 // const app = express();
 
-const { AWS_ACCESS_KEY_SECRET, AWS_ACCESS_KEY_ID, AWS_BUCKET_NAME } =
+const { AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, AWS_BUCKET_NAME } =
 	process.env;
 
-aws.Credentials(AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_SECRET);
+aws.Credentials(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY);
 
 aws.config.update({
 	region: 'us-west-1',
