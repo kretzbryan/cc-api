@@ -78,6 +78,7 @@ router.get('/:id', async (req, res) => {
 // 		return res.send('Error when uploading.');
 // 	}
 // });
+// change
 
 // creates a show route based on file name to for reference later
 // router.get('/image/:filename', (req, res) => {
