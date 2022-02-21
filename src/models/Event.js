@@ -5,7 +5,7 @@ const eventSchema = new mongoose.Schema(
 	{
 		title: { type: String, required: true },
 		description: { type: String, required: true },
-		image: { type: String, required: false },
+		imageLocation: { type: String, required: false },
 		createdBy: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User',
@@ -21,10 +21,10 @@ const eventSchema = new mongoose.Schema(
 			required: true,
 			default: 'Everyone',
 		},
-		timeRange: {
-			start: { type: Date, required: true },
-			end: { type: Date, required: true },
-		},
+		startDate: { type: String, required: true },
+		endDate: { type: String, required: true },
+		startTime: { type: String, required: true },
+		endTime: { type: String, required: true },
 		rsvps: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'RSVP',
@@ -41,7 +41,12 @@ const eventSchema = new mongoose.Schema(
 				ref: 'Tag',
 			},
 		],
-		location: { type: String, required: true },
+		location: {
+			address: { type: String, required: true },
+			lng: { type: String, required: true },
+			lat: { type: String, required: true },
+			name: { type: String, required: true },
+		},
 	},
 	{ timestamps: true }
 );

@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
 	try {
-		const gig = await db.Gig.findById(req.params.id);
+		const gig = await db.Gig.findById(req.params.id).populate('createdBy');
 		res.json(gig);
 	} catch (err) {
 		console.log(err);
@@ -23,11 +23,10 @@ router.get('/:id', async (req, res) => {
 
 // Creates gig with author Id, adds gig id to user.Gigs
 router.post('/', async (req, res) => {
-	const { gig } = req.body;
 	try {
 		const user = await db.User.findById(req.user.id);
-		const gig = new db.Gig({
-			gig,
+		const gig = await db.Gig.create({
+			...req.body,
 			createdBy: user.id,
 		});
 		await gig.save();

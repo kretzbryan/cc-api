@@ -40,6 +40,9 @@ router.get('/', async (req, res) => {
 				],
 			})
 			.populate('notifications.new notifications.read')
+			.populate(
+				'connections.requests.incoming connections.requests.outgoing connections.confirmed'
+			)
 			.populate({
 				path: 'posts',
 				populate: [
@@ -83,8 +86,8 @@ router.get('/', async (req, res) => {
 		let userCopy = { ...user._doc, notifications };
 
 		console.log(userCopy.notifications.new);
-
-		res.json({ user: userCopy });
+		const foundEvents = await db.Event.find({});
+		res.json({ user: userCopy, foundEvents });
 	} catch (err) {
 		res.status(500).send({ msg: err.message });
 	}

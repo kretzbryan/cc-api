@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models');
 
-router.post('/new-connection', async (req, res) => {
+router.post('/new', async (req, res) => {
 	const { recipient, message } = req.body;
 	try {
 		const user = await db.User.findById(req.user.id).catch((err) => {
@@ -17,15 +17,9 @@ router.post('/new-connection', async (req, res) => {
 			};
 		});
 
-		foundRecipient.connections.requests.incoming = [
-			...foundRecipient.connections.requests.incoming,
-			user,
-		];
+		foundRecipient.connections.requests.incoming.push(user);
 
-		user.connections.requests.outgoing = [
-			...user.connections.requests.outgoing,
-			foundRecipient,
-		];
+		user.connections.requests.outgoing.push(foundRecipient);
 
 		if (message) {
 			const newMessage = await db.Message.create({
@@ -53,9 +47,50 @@ router.post('/new-connection', async (req, res) => {
 		await user.save();
 		await foundRecipient.save();
 
-		restart.status(200).json({ success: true });
+		res.status(200).json({ success: true });
 	} catch (err) {
 		console.log(err.message);
 	}
 });
+
+router.post('/approve', async (req, res) => {
+	const { connectionId } = req.body;
+	try {
+		const user = await db.User.findById(req.user.id).populate(
+			'connections.requests.incoming connections.requests.outgoing connections.confirmed'
+		);
+		const newConnection = await db.User.findById(connectionId);
+		user.connections.requests.incoming =
+			user.connections.requests.incoming.filter(
+				(connection) => connection._id.toString() !== connectionId.toString()
+			);
+		user.connections.confirmed.push(newConnection);
+
+		await user.save();
+		res.json({ connections: user._doc.connections });
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ msg: 'An error occured, please try again.' });
+	}
+});
+
+router.post('/deny', async (req, res) => {
+	const { connectionId } = req.body;
+	try {
+		const user = await db.User.findById(req.user.id).population(
+			'connections.requests.incoming connections.requests.outgoing connections.confirmed'
+		);
+
+		user.connections.requests.incoming =
+			user.connections.requests.incoming.filter(
+				(connection) => connection._id.toString() !== connectionId.toString()
+			);
+		await user.save();
+		res.json({ connections: user._doc.connections });
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ msg: 'An error occured, please try again.' });
+	}
+});
+
 module.exports = router;

@@ -27,6 +27,46 @@ const db = require('../models');
 // 	}
 // });
 
+router.post('/read', async (req, res) => {
+	try {
+		const { threadId } = req.body;
+		const user = await db.User.findById(req.user.id);
+		const foundThread = await db.MessageThread.findById(threadId)
+			.populate('messages')
+			.catch((err) => {
+				throw {
+					message: err.message,
+				};
+			});
+
+		if (foundThread.users.includes(req.user.id)) {
+			const readMessages = await Promise.all(
+				foundThread.messages.map(async (message) => {
+					if (message.createdBy !== req.user.id) {
+						const updatedMessage = await db.Message.findByIdAndUpdate(
+							message._id,
+							{ ...message, read: true },
+							{ new: true }
+						);
+						return updatedMessage;
+					} else {
+						return message;
+					}
+				})
+			);
+			foundThread.messages = readMessages;
+			const savedThread = await foundThread.save().catch((err) => {
+				throw {
+					message: err.message,
+				};
+			});
+			res.status(200).json({ savedThread });
+		}
+	} catch (err) {
+		console.log(err.message);
+	}
+});
+
 router.post('/send-message', async (req, res) => {
 	try {
 		const { threadId, message } = req.body;

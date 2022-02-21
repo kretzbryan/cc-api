@@ -15,8 +15,8 @@ const connectDB = db.connectDB;
 connectDB();
 
 app.use(express.json({ extended: false }));
-// app.use(bodyParser.json());
-app.use(fileUpload());
+app.use(bodyParser.json());
+// app.use(fileUpload());
 app.use(methodOverride('_method'));
 app.use(cors());
 
