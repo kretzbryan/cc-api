@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
-const upload = require('../middleware/upload');
+// const upload = require('../middleware/upload');
 
 // Shows all profiles with the exception of the current User
 router.get('/all', async (req, res) => {
@@ -59,25 +59,25 @@ router.get('/:id', async (req, res) => {
 	}
 });
 
-router.put('/image', async function (req, res) {
-	req.file = req.files.file;
-	try {
-		await upload(req, res);
-		const updatedUser = await db.User.findByIdAndUpdate(req.user.id, {
-			profileImage: {
-				filename: req.file.name,
-				mimetype: req.file.mimetype,
-			},
-		}).select('-password');
-		if (req.file === undefined) {
-			return res.send('Select a file');
-		}
-		res.json(updatedUser);
-	} catch (err) {
-		console.log(err);
-		return res.send('Error when uploading.');
-	}
-});
+// router.put('/image', async function (req, res) {
+// 	req.file = req.files.file;
+// 	try {
+// 		await upload(req, res);
+// 		const updatedUser = await db.User.findByIdAndUpdate(req.user.id, {
+// 			profileImage: {
+// 				filename: req.file.name,
+// 				mimetype: req.file.mimetype,
+// 			},
+// 		}).select('-password');
+// 		if (req.file === undefined) {
+// 			return res.send('Select a file');
+// 		}
+// 		res.json(updatedUser);
+// 	} catch (err) {
+// 		console.log(err);
+// 		return res.send('Error when uploading.');
+// 	}
+// });
 
 // creates a show route based on file name to for reference later
 // router.get('/image/:filename', (req, res) => {
