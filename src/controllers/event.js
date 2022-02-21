@@ -14,11 +14,7 @@ router.get('/all', async (req, res) => {
 router.post('/create', async (req, res) => {
 	try {
 		let newEvent, newRSVP, newLocation, foundUser;
-		// newLocation = await db.Location.create(req.body.location).catch((err) => {
-		// 	throw {
-		// 		message: err.message,
-		// 	};
-		// });
+
 		newEvent = new db.Event({
 			...req.body,
 			createdBy: req.user.id,
