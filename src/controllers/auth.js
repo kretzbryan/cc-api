@@ -22,8 +22,8 @@ router.post(
 			return res.status(400).json({ errors: errors.array() });
 		}
 
-		const { email, password } = req.body;
-
+		let { email, password } = req.body;
+		email = email.toLowerCase();
 		try {
 			let foundUser = await db.User.findOne({ email });
 			if (foundUser) {
@@ -34,13 +34,30 @@ router.post(
 			const salt = await bcrypt.genSalt(10);
 			hash = await bcrypt.hash(password, salt);
 			req.body.password = hash;
-			const newUser = new db.User(req.body);
+			const newUser = new db.User({ ...req.body, email });
 			const newPrivacy = await db.Privacy.create({});
 			const newFollowing = await db.Following.create({});
 			newUser.privacy = newPrivacy;
 			newUser.following = newFollowing;
 			await newUser.save();
-			res.send('User registered');
+
+			const payload = {
+				user: {
+					id: newUser._id,
+				},
+			};
+			jwt.sign(
+				payload,
+				process.env.JWT_SECRET,
+				{ expiresIn: 36000 },
+				(err, token) => {
+					if (err) {
+						throw { message: `At jwt sign${err.message}` };
+					}
+					console.log(token, 'token');
+					res.status(200).json({ token });
+				}
+			);
 		} catch (err) {
 			console.log(err.message), res.status(500).send('Internal Server Error');
 		}

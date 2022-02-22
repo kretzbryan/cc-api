@@ -59,14 +59,22 @@ router.post('/approve', async (req, res) => {
 		const user = await db.User.findById(req.user.id).populate(
 			'connections.requests.incoming connections.requests.outgoing connections.confirmed'
 		);
-		const newConnection = await db.User.findById(connectionId);
+		const newConnection = await db.User.findById(connectionId).populate(
+			'connections.requests.incoming connections.requests.outgoing connections.confirmed'
+		);
 		user.connections.requests.incoming =
 			user.connections.requests.incoming.filter(
 				(connection) => connection._id.toString() !== connectionId.toString()
 			);
 		user.connections.confirmed.push(newConnection);
 
+		newConnection.connections.requests.outgoing =
+			newConnection.connections.requests.outgoing.filter(
+				(connection) => connection._id.toString() !== connectionId.toString()
+			);
+		newConnection.connections.confirmed.push(user);
 		await user.save();
+		await newConnection.save();
 		res.json({ connections: user._doc.connections });
 	} catch (err) {
 		console.log(err);
@@ -77,7 +85,11 @@ router.post('/approve', async (req, res) => {
 router.post('/deny', async (req, res) => {
 	const { connectionId } = req.body;
 	try {
-		const user = await db.User.findById(req.user.id).population(
+		const user = await db.User.findById(req.user.id).populate(
+			'connections.requests.incoming connections.requests.outgoing connections.confirmed'
+		);
+
+		const foundConnection = await db.User.findById(connectionId).populate(
 			'connections.requests.incoming connections.requests.outgoing connections.confirmed'
 		);
 
@@ -85,7 +97,39 @@ router.post('/deny', async (req, res) => {
 			user.connections.requests.incoming.filter(
 				(connection) => connection._id.toString() !== connectionId.toString()
 			);
+		foundConnection.connections.requests.outgoing =
+			foundConnection.connections.requests.outgoing.filter(
+				(connection) => connection._id.toString() !== user._id.toString()
+			);
 		await user.save();
+		await foundConnection.save();
+		res.json({ connections: user._doc.connections });
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ msg: 'An error occured, please try again.' });
+	}
+});
+
+router.post('/remove', async (req, res) => {
+	const { connectionId } = req.body;
+	try {
+		const user = await db.User.findById(req.user.id).populate(
+			'connections.requests.incoming connections.requests.outgoing connections.confirmed'
+		);
+
+		const foundConnection = await db.User.findById(connectionId).populate(
+			'connections.requests.incoming connections.requests.outgoing connections.confirmed'
+		);
+
+		user.connections.confirmed = user.connections.confirmed.filter(
+			(connection) => connection._id.toString() !== connectionId.toString()
+		);
+		foundConnection.connections.confirmed =
+			foundConnection.connections.confirmed.filter(
+				(connection) => connection._id.toString() !== user._id.toString()
+			);
+		await user.save();
+		await foundConnection.save();
 		res.json({ connections: user._doc.connections });
 	} catch (err) {
 		console.log(err);

@@ -30,9 +30,51 @@ const db = require('../models');
 router.post('/read', async (req, res) => {
 	try {
 		const { threadId } = req.body;
-		const user = await db.User.findById(req.user.id);
+		const user = await db.User.findById(req.user.id).populate([
+			{
+				path: 'threads.unread',
+				populate: [
+					{
+						path: 'users',
+						model: 'User',
+					},
+					{
+						path: 'messages',
+						model: 'Message',
+						populate: {
+							path: 'createdBy',
+							model: 'User',
+						},
+					},
+				],
+			},
+			{
+				path: 'threads.read',
+				populate: [
+					{
+						path: 'users',
+						model: 'User',
+					},
+					{
+						path: 'messages',
+						model: 'Message',
+						populate: {
+							path: 'createdBy',
+							model: 'User',
+						},
+					},
+				],
+			},
+		]);
 		const foundThread = await db.MessageThread.findById(threadId)
-			.populate('messages')
+			.populate({
+				path: 'messages',
+				model: 'Message',
+				populate: {
+					path: 'createdBy',
+					model: 'User',
+				},
+			})
 			.catch((err) => {
 				throw {
 					message: err.message,
@@ -40,46 +82,67 @@ router.post('/read', async (req, res) => {
 			});
 
 		if (foundThread.users.includes(req.user.id)) {
-			const readMessages = await Promise.all(
-				foundThread.messages.map(async (message) => {
-					if (message.createdBy !== req.user.id) {
-						const updatedMessage = await db.Message.findByIdAndUpdate(
-							message._id,
-							{ ...message, read: true },
-							{ new: true }
-						);
-						return updatedMessage;
-					} else {
-						return message;
-					}
-				})
-			);
-			foundThread.messages = readMessages;
-			const savedThread = await foundThread.save().catch((err) => {
-				throw {
-					message: err.message,
-				};
+			user.threads.read.push(foundThread);
+			user.threads.unread = user.threads.unread.filter((readThread) => {
+				return readThread._id.toString() !== foundThread._id.toString();
 			});
-			res.status(200).json({ savedThread });
+
+			const savedUser = await user.save();
+			res.status(200).json({ savedUser });
 		}
 	} catch (err) {
 		console.log(err.message);
 	}
 });
 
+const updateUsers = async (thread, sender) => {
+	const { users } = thread;
+	const senderId = sender._id.toString();
+	const updatedUsers = await Promise.all(
+		users.map(async (recipient) => {
+			if (recipient.toString() !== senderId) {
+				console.log('going to update!');
+				const updatedUser = await db.User.findById(recipient).populate('');
+				if (updatedUser.threads.read.includes(thread._id)) {
+					updatedUser.threads.unread.push(thread);
+					updatedUser.threads.read = updatedUser.threads.read.filter(
+						(readThread) => {
+							return readThread.toString() !== thread._id.toString();
+						}
+					);
+					const savedUser = await updatedUser.save();
+					console.log(savedUser);
+					return savedUser;
+				} else {
+					return recipient;
+				}
+			} else {
+				return recipient;
+			}
+		})
+	);
+};
+
 router.post('/send-message', async (req, res) => {
 	try {
 		const { threadId, message } = req.body;
 		const user = await db.User.findById(req.user.id);
-		const foundThread = await db.MessageThread.findById(threadId).catch(
-			(err) => {
+		const foundThread = await db.MessageThread.findById(threadId)
+			.populate({
+				path: 'messages',
+				model: 'Message',
+				populate: {
+					path: 'createdBy',
+					model: 'User',
+				},
+			})
+			.catch((err) => {
 				throw {
 					message: err.message,
 				};
-			}
-		);
+			});
 		if (foundThread.users.includes(req.user.id)) {
-			const newMessage = new db.Message(message);
+			const newMessage = new db.Message({ ...message, createdBy: user });
 			const savedMessage = await newMessage.save().catch((err) => {
 				throw {
 					message: err.message,
@@ -91,9 +154,9 @@ router.post('/send-message', async (req, res) => {
 					message: err.message,
 				};
 			});
-			res
-				.status(200)
-				.json({ savedMessage: { ...savedMessage._doc, createdBy: user } });
+
+			await updateUsers(savedThread, user);
+			res.status(200).json({ savedThread });
 		}
 	} catch (err) {
 		console.log(err.message);
@@ -130,15 +193,9 @@ router.post('/new-message-thread', async (req, res) => {
 				};
 			}
 		);
+		recipient.threads.unread.push(newThread);
 
-		recipient.message = {
-			unreadCount: recipient.message.unreadCount++,
-			messages: [...recipient.message.messages, newThread],
-		};
-		user.message = {
-			...user.message,
-			messages: [...user.message.messages, newThread],
-		};
+		user.threads.read.push(newThread);
 
 		await user.save();
 		await recipient.save();

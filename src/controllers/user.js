@@ -22,23 +22,42 @@ router.get('/', async (req, res) => {
 		console.log(req.user);
 		const user = await db.User.findById(req.user.id)
 			.select('-password')
-			.populate({
-				path: 'message.messages',
-				populate: [
-					{
-						path: 'users',
-						model: 'User',
-					},
-					{
-						path: 'messages',
-						model: 'Message',
-						populate: {
-							path: 'createdBy',
+			.populate([
+				{
+					path: 'threads.unread',
+					populate: [
+						{
+							path: 'users',
 							model: 'User',
 						},
-					},
-				],
-			})
+						{
+							path: 'messages',
+							model: 'Message',
+							populate: {
+								path: 'createdBy',
+								model: 'User',
+							},
+						},
+					],
+				},
+				{
+					path: 'threads.read',
+					populate: [
+						{
+							path: 'users',
+							model: 'User',
+						},
+						{
+							path: 'messages',
+							model: 'Message',
+							populate: {
+								path: 'createdBy',
+								model: 'User',
+							},
+						},
+					],
+				},
+			])
 			.populate('notifications.new notifications.read')
 			.populate(
 				'connections.requests.incoming connections.requests.outgoing connections.confirmed'

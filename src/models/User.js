@@ -78,9 +78,14 @@ const userSchema = new mongoose.Schema(
 				},
 			],
 		},
-		message: {
-			unreadCount: { type: Number, required: true, default: 0 },
-			messages: [
+		threads: {
+			unread: [
+				{
+					type: mongoose.Schema.Types.ObjectId,
+					ref: 'MessageThread',
+				},
+			],
+			read: [
 				{
 					type: mongoose.Schema.Types.ObjectId,
 					ref: 'MessageThread',
