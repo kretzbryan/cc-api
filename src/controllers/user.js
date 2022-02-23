@@ -4,6 +4,7 @@ const db = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
+const { uploadToS3 } = require('../middleware/upload');
 
 const handleNotificationPopulate = async (notification) => {
 	let data;
@@ -145,6 +146,91 @@ router.post('/check-unique-field', async (req, res) => {
 		}
 	} catch (err) {
 		res.status(500).send({ msg: err.message });
+	}
+});
+
+router.post('/image-upload', async (req, res) => {
+	try {
+		const user = await db.User.findById(req.user.id)
+			.populate([
+				{
+					path: 'threads.unread',
+					populate: [
+						{
+							path: 'users',
+							model: 'User',
+						},
+						{
+							path: 'messages',
+							model: 'Message',
+							populate: {
+								path: 'createdBy',
+								model: 'User',
+							},
+						},
+					],
+				},
+				{
+					path: 'threads.read',
+					populate: [
+						{
+							path: 'users',
+							model: 'User',
+						},
+						{
+							path: 'messages',
+							model: 'Message',
+							populate: {
+								path: 'createdBy',
+								model: 'User',
+							},
+						},
+					],
+				},
+			])
+			.populate('notifications.new notifications.read')
+			.populate(
+				'connections.requests.incoming connections.requests.outgoing connections.confirmed'
+			)
+			.populate({
+				path: 'posts',
+				populate: [
+					{
+						path: 'createdBy',
+						model: 'User',
+					},
+					{
+						path: 'comments',
+						model: 'Comment',
+						populate: [
+							{
+								path: 'createdBy',
+								model: 'User',
+							},
+							{
+								path: 'comments',
+								model: 'Comment',
+								populate: {
+									path: 'createdBy',
+									model: 'User',
+								},
+							},
+						],
+					},
+				],
+			});
+		const image = await uploadToS3(req, res).catch((err) => {
+			throw {
+				message: err.message,
+			};
+		});
+		user.profileImage = image;
+		const savedUser = await user.save();
+		res.status(200).json({ user: savedUser });
+		// .json(imageRes);
+	} catch (err) {
+		console.log(err);
+		res.status(500).json(err.message);
 	}
 });
 
